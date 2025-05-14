@@ -1,0 +1,13 @@
+# Ignore runtime/build files
+.next/
+node_modules/
+.env
+
+# Optional: OS/editor specific
+.DS_Store
+*.log
+*.swp
+
+# Optional: IDE
+.vscode/
+.idea/
