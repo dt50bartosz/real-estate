@@ -23,7 +23,7 @@ export default function TopSection({ topSection }) {
         <Address town={convertToTowns(town)} postCode = {postal_code}/>
       </div>
       <div className="h-[40vh] mt-10 flex md:gap-15 xl:gap-7rem]">
-        <Gallery photos={photos} />
+      
         <div>
         <BasicInformation basicInfo={basicInformation} />
         

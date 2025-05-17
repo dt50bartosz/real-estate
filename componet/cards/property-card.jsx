@@ -29,9 +29,9 @@ export default function PropertyCard({ property }) {
     photos = ''
   } = property;
 
-  const parsed = JSON.parse(photos);
-  const firstPhoto = `${process.env.NEXT_PUBLIC_HTML}` + parsed[0];
-
+  //const parsed = JSON.parse(photos);
+ // const firstPhoto = `${process.env.NEXT_PUBLIC_HTML}` + parsed[0];
+  console.log("phots",photos);
 
 
   const [shortTitle, setShortTitle] = useState(title);
@@ -53,7 +53,7 @@ export default function PropertyCard({ property }) {
 
       <CardContent className="flex py-0 gap-4 relative min-h-[20vh]">
         <Image
-          src={firstPhoto}
+          src={photo1}
           alt="Property Image"
           layout="fill"
           className="object-cover rounded-tl-xl rounded-tr-xl"

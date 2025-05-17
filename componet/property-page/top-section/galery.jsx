@@ -11,7 +11,7 @@ export default function Gallery({ photos }) {
  const [openModal,setModal] = useState(false);
 
 
-  const cleanedPhotos = cleanPhotoString(photos).map(path => BASE_URL + path);
+  
  
   
   return (

@@ -8,7 +8,7 @@ export const metadata = {
   title: "Home | DreamSpace Real Estate",
   description: "Find your perfect home with DreamSpace Real Estate. Browse listings, explore neighborhoods, and connect with trusted agents.",
   openGraph: {
-    titlecc: "Home | Nieruchomości w Słońcu",
+    title: "Home | Nieruchomości w Słońcu",
     description: "Find your perfect home with DreamSpace Real Estate. Browse listings, explore neighborhoods, and connect with trusted agents.",
     url: "https://dreamspace.com", // Replace with your actual domain
     siteName: "Nieruchomości w Słońcu",

@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { signIn } from "next-auth/react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -34,24 +35,22 @@ export default function LoginPage() {
   })
 
   const onSubmit = async (values) => {
-  
     try {
-      const res = await fetch( `${process.env.NEXT_PUBLIC_HTML}/user/login`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-        credentials: 'include',  // Ensure cookies are sent  
+      const res = await signIn("credentials", {
+        redirect: false,
+        username: values.username,
+        password: values.password,
+        callbackUrl: "/dashboard",
       })
 
-      if (!res.ok) {
-        const errorData = await res.text()
-        alert(`Login failed: ${errorData}`)
+      if (res?.error) {
+        alert(`Login failed: ${res.error}`)
         return
       }
-      const data = await res.text()
-      window.location.href = "/dashboard";
+
+      if (res?.url) {
+        window.location.href = res.url
+      }
     } catch (error) {
       console.error("Login error:", error)
       alert("An error occurred during login.")

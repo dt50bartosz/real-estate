@@ -15,7 +15,7 @@ export default function OfertaPage() {
   }, []);
 
   const fetchProperties = async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_HTML}/property/lates-property/`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_HTML}/properties/latest-properties`, {
       cache: "no-store",
     });
     const data = await res.json();
@@ -25,7 +25,7 @@ export default function OfertaPage() {
   const handleSearch = async (formData) => {
     const query = new URLSearchParams(formData).toString();
     router.push(`/oferta?${query}`);
-    const res = await fetch(`${process.env.NEXT_PUBLIC_HTML}/property/search?${query}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_HTML}/properties/search?${query}`, {
       cache: "no-store",
     });
 

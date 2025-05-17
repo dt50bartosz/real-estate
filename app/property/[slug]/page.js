@@ -2,11 +2,14 @@ import PropertyPage from "@/componet/property-page/property-page";
 import { slugToTitle } from "@/lib/utils";
 import { convertToTowns } from "@/lib/utils";
 
-export default async function PropertyPageWrapper({ params }) {
-  const { slug } = await params;
-  console.log("params",slug);
+export default async function PropertyPageWrapper(context) {
+  const params = await context.params;
+  const { slug } = params;
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_HTML}/property/property-by-title/${slugToTitle(slug)}`);
+
+  
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_HTML}/properties/property-by-title/${slug}`);
 
   if (!res.ok) {
     return <div>Failed to fetch property data</div>;

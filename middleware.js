@@ -1,29 +1,34 @@
-import { NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
+import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET); // ✅ Must be Uint8Array
+const SECRET =  process.env.AUTH_SECRET;
 
-export async function middleware(request) {
-  const tokenObject = request.cookies.get('auth_token');
-  const token = tokenObject?.value;
 
-  if (!token || typeof token !== 'string') {
-    console.log("Token is missing or not a valid string.");
-    return NextResponse.redirect(new URL('/login', request.url)); 
+export async function middleware(req) {
+  // Public paths that don't require auth
+  const publicPaths = ["/login", "/api/auth", "/_next", "/favicon.ico"];
+  if (publicPaths.some(path => req.nextUrl.pathname.startsWith(path))) {
+    return NextResponse.next();
   }
 
-  try {
-    // ✅ jose requires Uint8Array secret
-    const { payload } = await jwtVerify(token, SECRET_KEY);
-    console.log("Decoded Token:", payload);
+  console.log("NEXTAUTH_SECRET from env:", process.env.AUTH_SECRET);
 
-    return NextResponse.next(); // Allow request through
-  } catch (error) {
-    console.error("Token verification failed:", error.message);
-    return NextResponse.redirect(new URL('/login', request.url));
+
+  // Get JWT token from request
+  const token = await getToken({ req, secret: SECRET });
+
+  if (!token) {
+    // Redirect to login if not authenticated
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("callbackUrl", req.url);
+    return NextResponse.redirect(loginUrl);
   }
+
+  // Authenticated, continue
+  return NextResponse.next();
 }
 
+// Configure middleware to run on specific paths
 export const config = {
-  matcher: ['/dashboard/:path*', '/add-property/:path*', '/properties-list/:path*'],
+  matcher: ["/dashboard/:path*", "/profile/:path*", "/api/protected/:path*"],
 };

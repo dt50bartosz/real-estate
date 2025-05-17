@@ -98,58 +98,67 @@ export default function AddPropertyForm() {
  
   const { handleSubmit } = form;
 
-  const onSubmit = async (data) => {
-    try {
-      const formData = new FormData();
-  
-      // Preparing the form data for submission
-      for (const [key, value] of Object.entries(data)) {
-        if (key === "photos" && value?.length > 0) {
-          Array.from(value).forEach((file) => formData.append("photos", file));
-        } else if (Array.isArray(value)) {
-          value.forEach((v) => formData.append(`${key}[]`, v));
-        } else if (value !== undefined && value !== null) {
-          formData.append(key, value);
-        }
-      }
-  
-      
-      const response = await fetch(`${process.env.NEXT_PUBLIC_HTML}/property/add-property`, {
-        // Your options here
-    
-      
-        method: "POST",
-        body: formData,
-        credentials: "include",  // ⬅️ this is required to send cookies!
-      });
-      
-      
-      console.log("respoenio",response);
+const onSubmit = async (data) => {
+  try {
+    const formData = new FormData();
 
-      if (!response.ok) {
-        const result = await response.json();
-        console.log(result);
-        if (result.error === "title") {
-          setTitleError("Tytuł jest już użyty");
-          setIdError(""); // Clear other errors
-        } else if (result.error === "id") {
-          setIdError("ID jest zajęte");
-          setTitleError(""); // Clear other errors
-        } else {
-          setTitleError(""); // Clear errors
-          setIdError(""); // Clear errors
-        }
-      } else {
-        const result = await response.json();
-        setSuccessMessage(result.message); // Display success message
-        // Optionally, clear the form here if you want to reset the form after submission
-      }
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      setTitleError("");
-      setIdError(""); // Clear other errors
+
+ 
+    for (const file of data.photos) {  // Iterate over FileList or array
+      formData.append("photos", file);
     }
-  };
+   
+  
+
+    // Append other fields (skip 'photos' since handled)
+    for (const key in data) {
+      if (key === "photos") continue;
+
+      const value = data[key];
+
+      if (Array.isArray(value)) {
+        value.forEach((item) => {
+          formData.append(`${key}[]`, String(item));
+        });
+      } else if (value !== undefined && value !== null) {
+        formData.append(key, String(value));
+      }
+    }
+
+    // Send the request
+    const response = await fetch("/api/properties/add", {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      if (result.error === "title") {
+        setTitleError("Tytuł jest już użyty");
+        setIdError("");
+      } else if (result.error === "id") {
+        setIdError("ID jest zajęte");
+        setTitleError("");
+      } else {
+        setTitleError("");
+        setIdError("");
+      }
+    } else {
+      setSuccessMessage(result.message);
+      // Optionally reset your form here
+    }
+  } catch (error) {
+    console.error("Error submitting form:", error);
+    setTitleError("");
+    setIdError("");
+  }
+};
+
+
+
+
   
   return (
     <div className="w-full md:w-[50%] mx-auto shadow-xl rounded-lg">

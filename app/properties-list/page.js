@@ -1,31 +1,24 @@
 import PropertiesTable from "@/componet/admin/properties-table/properties-tables";
 import SideBar from "@/componet/admin/side-bar";
-import { cookies } from "next/headers";
 
 export default async function Properties() {
-  const cookieStore = await cookies();
-  const authCookie = await cookieStore.get("auth_token");
+  let properties;
 
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_HTML}/properties/all-properties`, {
+      cache: 'no-store',
+    });
 
-
-  if (!authCookie) {
-    throw new Error("Auth cookie not found");
+    if (res.ok) {
+      properties = await res.json();
+    } else {
+      properties = "No Properties";
+    }
+  } catch (error) {
+    console.error("Error fetching properties:", error);
+    properties = "No Properties";
   }
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_HTML}/property/all-properties`,{
-    headers: {
-      Cookie: `auth_token=${authCookie.value}`,
-    },
-    credentials: "include", 
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch properties");
-  }
-
-  const properties = await res.json();
- 
   return (
     <main className="flex mt-[5rem] mb-[5rem] gap-10">
       <SideBar />

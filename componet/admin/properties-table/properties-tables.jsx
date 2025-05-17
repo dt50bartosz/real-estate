@@ -33,53 +33,54 @@ export default function  PropertiesTable({ data }) {
     router.push(`/edit-property/${titleParam}`);
   };
 
-  const handleMarkAsSold = async (rowData) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_HTML}/property/sold?id=${rowData.property_id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+const handleMarkAsSold = async (rowData) => {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_HTML}/properties/sold`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ propertyId: rowData.propertyId }),  // <-- outside headers
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      alert("Property marked as sold");
+      setTableData((prev) =>
+        prev.map((item) =>
+          item.propertyId === rowData.propertyId
+            ? { ...item, status: 0 }  // or false if you prefer
+            : item
+        )
       );
-  
-      if (response.ok) {
-        const data = await response.json();   
-  
-        alert("Property marked as sold");  
-        setTableData((prev) =>
-          prev.map((item) =>
-            item.property_id === rowData.property_id
-              ? { ...item, status: 0 } // update the status locally
-              : item
-          )
-        );
-      } else {
-        const error = await response.json();
-        console.error("Failed to mark as sold:", error.message);
-        alert(`Failed to mark as sold: ${error.message}`);
-      }
-    } catch (error) {
-      console.error("Error marking as sold:", error);
-      alert("Error marking as sold");
+    } else {
+      const error = await response.json();
+      console.error("Failed to mark as sold:", error.message);
+      alert(`Failed to mark as sold: ${error.message}`);
     }
-  };
-  
+  } catch (error) {
+    console.error("Error marking as sold:", error);
+    alert("Error marking as sold");
+  }
+};
+
+
   
 
   const handleDelete = async (rowData) => {
     console.log("rowData", rowData.title);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_HTML}/property/delete?title=${rowData.title}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_HTML}/properties/delete`, {
         method: "DELETE",
         credentials: "include",
+        body: JSON.stringify({ propertyId: rowData.propertyId }),
       });
-  
+        
       if (response.ok) {
         alert("Deleted successfully");
         setTableData((prev) =>
-          prev.filter((item) => item.property_id !== rowData.property_id)
+          prev.filter((item) => item.propertyId !== rowData.propertyId)
         );
       } else {
         const error = await response.json();
@@ -94,7 +95,7 @@ export default function  PropertiesTable({ data }) {
   // Columns defined inside the component to access state handlers
   const columns = React.useMemo(
     () => [
-      { header: "Property Id", accessorKey: "property_id" },
+      { header: "Property Id", accessorKey: "propertyId" },
       { header: "Owner", accessorKey: "seller_name" },
       { header: "Phone Number", accessorKey: "telephone" },
       { header: "Title", accessorKey: "title" },
@@ -104,7 +105,8 @@ export default function  PropertiesTable({ data }) {
         accessorKey: "status",
         cell: ({ getValue }) => {
           const status = getValue();
-          return status === 1 ? "aktywne" : "sprzedane";
+          console.log("status",status);
+          return status === false ? "aktywne" : "sprzedane";
         },
       },
     ],
